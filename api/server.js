@@ -39,4 +39,15 @@ app.use('/graphql', (req, res, next) => {
 
 db.on('connected', () => {
   app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+  /*
+  setTimeout(() => {
+    const URL = require('./models/urlModel');
+
+    URL.create({
+      url: 'https://www.youtube.com/watch?v=TwXQfT_0DdU',
+      isObscured: true,
+    });
+  }, 1000);
+  */
 });
