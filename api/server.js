@@ -8,6 +8,7 @@ const MyGraphQLSchema = require('./schema/schema');
 require('./utils/pass');
 const db = require('./utils/db');
 const auth = require('./routes/authRouter');
+const url = require('./routes/urlRouter');
 const port = process.env.PORT || 3000;
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', auth);
+app.use('/', url);
 
 const checkAuth = (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
