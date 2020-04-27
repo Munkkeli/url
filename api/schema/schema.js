@@ -1,5 +1,6 @@
 'use strict';
 const URL = require('../models/urlModel');
+const urlController = require('../controllers/urlController');
 
 const {
   GraphQLObjectType,
@@ -45,12 +46,7 @@ const Mutation = new GraphQLObjectType({
         // TODO: Make auth work
         // checkAuth(req, res, next);
 
-        return URL.create({
-          url: args.url,
-          password: args.password,
-          isObscured: args.isObscured === true,
-          expiresAt: args.expiresAt,
-        });
+        return urlController.minify(req, { ...args });
       },
     },
   },

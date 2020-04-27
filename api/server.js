@@ -8,6 +8,7 @@ const cors = require('cors');
 const graphqlHTTP = require('express-graphql');
 const MyGraphQLSchema = require('./schema/schema');
 require('./utils/pass');
+require('./utils/matomo');
 const db = require('./utils/db');
 const auth = require('./routes/authRouter');
 const url = require('./routes/urlRouter');

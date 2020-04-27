@@ -16,6 +16,7 @@
     "graphql": "^14.6.0",
     "hashids": "^2.2.1",
     "helmet": "^3.22.0",
+    "matomo-tracker": "^2.2.1",
     "mongoose": "^5.9.7",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
