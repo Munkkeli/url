@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Color } from '../Style';
+import ArrowRightCircleOutlineIcon from 'mdi-react/ArrowRightCircleOutlineIcon';
+import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
 
 import { Dropdown } from './Dropdown';
 
 const Styled = {
-  Hero: styled.div`
+  Hero: styled.div<{ done: boolean }>`
     display: flex;
     padding: 200px;
     width: 100vw;
@@ -36,8 +38,8 @@ const Styled = {
         padding: 16px;
         width: 100%;
         font-size: 2em;
-        border-radius: 6px;
-        background-color: #c99fff;
+        border-radius: 6px 0 0 6px;
+        background-color: ${(props) => (props.done ? '#fff' : '#c99fff')};
         border: none;
         outline: none;
 
@@ -45,6 +47,28 @@ const Styled = {
           color: #814cc6;
           opacity: 1;
         }
+      }
+    }
+  `,
+  Input: styled.div<{ done: boolean }>`
+    display: flex;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 70px;
+      width: 120px;
+      background-image: none;
+      border: none;
+      outline: none;
+      border-radius: 0 6px 6px 0;
+      background-color: ${(props) => (props.done ? '#fff' : '#a474e0')};
+
+      svg {
+        width: 32px;
+        height: 32px;
+        fill: #49227b;
       }
     }
   `,
@@ -112,13 +136,22 @@ const fetchGraphql = async (query: any) => {
 export const Hero: React.FC = () => {
   const [isShortened, setIsShortened] = useState<boolean>(false);
   const [url, setUrl] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUrlChange = (event: any) => {
+    if (isShortened) return;
     setUrl(event.target.value);
+  };
+
+  const handleUrlClick = (event: any) => {
+    if (!isShortened) return;
+    inputRef.current?.select();
   };
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+
+    if (isShortened) return;
 
     const result = await fetchGraphql({
       query: `
@@ -142,7 +175,7 @@ export const Hero: React.FC = () => {
   };
 
   return (
-    <Styled.Hero>
+    <Styled.Hero done={isShortened}>
       <div className="side text">
         <h1>
           Share with
@@ -163,15 +196,27 @@ export const Hero: React.FC = () => {
       <div className="side">
         <form onSubmit={handleSubmit}>
           <h3>Just paste any link here and see the magic happen</h3>
-          <input
-            type="text"
-            placeholder="https://"
-            value={url}
-            onChange={handleUrlChange}
-            disabled={isShortened}
-          />
 
-          {!isShortened && <button type="submit">Shorten</button>}
+          <Styled.Input done={isShortened}>
+            <input
+              type="text"
+              placeholder="https://"
+              value={url}
+              onChange={handleUrlChange}
+              onClick={handleUrlClick}
+              ref={inputRef}
+            />
+
+            {!isShortened ? (
+              <button type="submit">
+                <ArrowRightCircleOutlineIcon />
+              </button>
+            ) : (
+              <button>
+                <CheckboxMarkedCircleOutlineIcon />
+              </button>
+            )}
+          </Styled.Input>
 
           <p>
             I want my link to be{' '}
