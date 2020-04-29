@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { Color } from '../Style';
+import * as Util from '../Util';
 
 const Styled = {
   Page: styled.div`
@@ -51,8 +52,25 @@ const Styled = {
 export const Register: React.FC = () => {
   const { register, handleSubmit, errors } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    if (data.password != data.repassword) return;
+
+    const result = await Util.fetch({
+      query: `
+        mutation Register($email: String!, $password: String!) {
+          registerUser(email: $email, password: $password) {
+            email
+          }
+        }
+      `,
+      variables: {
+        email: data.email,
+        password: data.password,
+      },
+    });
+
+    if (!result) {
+    }
   };
 
   return (
@@ -76,7 +94,7 @@ export const Register: React.FC = () => {
           <label>Re-Password</label>
           <input
             ref={register({ required: true })}
-            name="re-password"
+            name="repassword"
             type="password"
           />
         </Styled.Input>

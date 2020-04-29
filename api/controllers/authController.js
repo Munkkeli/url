@@ -1,6 +1,8 @@
 'use strict';
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const p4ssw0rd = require('p4ssw0rd');
+const User = require('../models/userModel');
 
 const login = (req, res, next) => {
   passport.authenticate('local', { session: false }, (err, user, info) => {
@@ -22,6 +24,17 @@ const login = (req, res, next) => {
   })(req, res, next);
 };
 
+const register = async ({ email, password }) => {
+  const isInUse = await User.count({ email });
+  if (isInUse > 0) throw new Error('Email is already in use, please login.');
+
+  await User.create({
+    email,
+    password: p4ssw0rd.hash(password),
+  });
+};
+
 module.exports = {
   login,
+  register,
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Color } from '../Style';
+import * as Util from '../Util';
 import ArrowRightCircleOutlineIcon from 'mdi-react/ArrowRightCircleOutlineIcon';
 import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
 
@@ -111,28 +112,7 @@ const linkAnalyticsOptions = [
   },
 ];
 
-const apiURL = 'http://localhost:3001/graphql';
 const shortenedBaseUrl = 'http://localhost:3001/';
-
-const fetchGraphql = async (query: any) => {
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      // Authorization: 'Bearer ' + localStorage.getItem('token'),
-    },
-    body: JSON.stringify(query),
-  };
-  try {
-    const response = await fetch(apiURL, options);
-    const json = await response.json();
-    return json.data;
-  } catch (e) {
-    console.log(e);
-    return false;
-  }
-};
 
 export const Hero: React.FC = () => {
   const [isShortened, setIsShortened] = useState<boolean>(false);
@@ -159,7 +139,7 @@ export const Hero: React.FC = () => {
 
     if (isShortened) return;
 
-    const result = await fetchGraphql({
+    const result = await Util.fetch({
       query: `
         mutation Shorten($url: String!) {
           shortenUrl(url: $url) {

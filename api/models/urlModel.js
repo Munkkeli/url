@@ -20,9 +20,9 @@ const Index = mongoose.model('Index', urlIndexSchema);
 
 const urlSchema = new Schema({
   _id: Number,
+  _user: { type: Schema.Types.ObjectId, ref: 'User' },
   hash: { type: String, index: true, unique: true },
   url: { type: String, required: true },
-  user: { type: Schema.Types.ObjectId, ref: 'User' },
   password: String,
   isObscured: Boolean,
   expiresAt: Date,

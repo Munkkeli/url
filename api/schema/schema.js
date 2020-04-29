@@ -1,5 +1,6 @@
 'use strict';
 const URL = require('../models/urlModel');
+const authController = require('../controllers/authController');
 const urlController = require('../controllers/urlController');
 
 const {
@@ -29,6 +30,14 @@ const urlType = new GraphQLObjectType({
   }),
 });
 
+const userType = new GraphQLObjectType({
+  name: 'user',
+  description: 'User record',
+  fields: () => ({
+    email: { type: GraphQLString },
+  }),
+});
+
 const Mutation = new GraphQLObjectType({
   name: 'MutationType',
   description: 'Mutations...',
@@ -47,6 +56,17 @@ const Mutation = new GraphQLObjectType({
         // checkAuth(req, res, next);
 
         return urlController.minify(req, { ...args });
+      },
+    },
+    registerUser: {
+      type: userType,
+      description: 'Register a new user',
+      args: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args, { req, res, next, checkAuth }) {
+        return authController.register({ ...args });
       },
     },
   },
