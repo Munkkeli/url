@@ -4,6 +4,7 @@ import { Color } from '../Style';
 import ArrowRightCircleOutlineIcon from 'mdi-react/ArrowRightCircleOutlineIcon';
 import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
 
+import { Checkbox } from './Checkbox';
 import { Dropdown } from './Dropdown';
 
 const Styled = {
@@ -135,6 +136,7 @@ const fetchGraphql = async (query: any) => {
 
 export const Hero: React.FC = () => {
   const [isShortened, setIsShortened] = useState<boolean>(false);
+  const [isMine, setIsMine] = useState<boolean>(false);
   const [url, setUrl] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -146,6 +148,10 @@ export const Hero: React.FC = () => {
   const handleUrlClick = (event: any) => {
     if (!isShortened) return;
     inputRef.current?.select();
+  };
+
+  const handleMineChange = (event: any) => {
+    setIsMine(event.target.checked);
   };
 
   const handleSubmit = async (event: any) => {
@@ -229,6 +235,12 @@ export const Hero: React.FC = () => {
             />{' '}
             how it is used.
           </p>
+
+          <Checkbox
+            label="Link this URL to my account"
+            checked={isMine}
+            onChange={handleMineChange}
+          />
 
           <input type="email" placeholder="Email" />
           <input type="password" placeholder="Password" />
