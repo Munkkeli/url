@@ -5,8 +5,6 @@ const matomo = require('../utils/matomo');
 const minify = async (req, { url, password, isObscured, expiresAt }) => {
   matomo.trackUrlCreate(req, url);
 
-  console.log(req.user, req.session);
-
   return URL.create({
     url,
     password,

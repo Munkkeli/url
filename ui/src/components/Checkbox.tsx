@@ -9,7 +9,8 @@ const Styled = {
     position: relative;
     display: block;
     height: 32px;
-    padding-left: 48px;
+    padding-left: 44px;
+    line-height: 32px;
     user-select: none;
     cursor: pointer;
 

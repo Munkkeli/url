@@ -38,6 +38,14 @@ const userType = new GraphQLObjectType({
   }),
 });
 
+const registerType = new GraphQLObjectType({
+  name: 'register',
+  description: 'Register response',
+  fields: () => ({
+    token: { type: GraphQLString },
+  }),
+});
+
 const Mutation = new GraphQLObjectType({
   name: 'MutationType',
   description: 'Mutations...',
@@ -59,14 +67,14 @@ const Mutation = new GraphQLObjectType({
       },
     },
     registerUser: {
-      type: userType,
+      type: registerType,
       description: 'Register a new user',
       args: {
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args, { req, res, next, checkAuth }) {
-        return authController.register({ ...args });
+        return authController.register(req, { ...args });
       },
     },
   },

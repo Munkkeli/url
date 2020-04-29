@@ -4,6 +4,7 @@ import { Color } from '../Style';
 import * as Util from '../Util';
 import ArrowRightCircleOutlineIcon from 'mdi-react/ArrowRightCircleOutlineIcon';
 import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
+import ArrowBottomLeftThickIcon from 'mdi-react/ArrowBottomLeftThickIcon';
 
 import { Checkbox } from './Checkbox';
 import { Dropdown } from './Dropdown';
@@ -16,6 +17,7 @@ const Styled = {
     height: 100vh;
     background-color: ${Color.primary};
     box-sizing: border-box;
+    color: ${Color.text};
 
     .side {
       flex: 1;
@@ -33,6 +35,17 @@ const Styled = {
     h1 {
       font-size: 4em;
       color: #e9d8ff;
+    }
+
+    h3 {
+      position: relative;
+      margin-left: 32px;
+      padding-left: 28px;
+
+      svg {
+        position: absolute;
+        left: 0;
+      }
     }
 
     form {
@@ -54,6 +67,7 @@ const Styled = {
   `,
   Input: styled.div<{ done: boolean }>`
     display: flex;
+    margin: 32px 0;
 
     button {
       display: flex;
@@ -74,6 +88,9 @@ const Styled = {
       }
     }
   `,
+  Text: styled.p`
+    font-size: 1.2em;
+  `,
 };
 
 const linkTypeOptions = [
@@ -87,11 +104,13 @@ const linkTypeOptions = [
     description:
       'The link will be long and extremely hard to guess. Pick this option when privacy is a concern.',
   },
+  /*
   {
     title: 'secured with a password',
     description:
       'The link will be short, but only those with the password can access it.',
   },
+  */
 ];
 
 const linkAnalyticsOptions = [
@@ -118,7 +137,13 @@ export const Hero: React.FC = () => {
   const [isShortened, setIsShortened] = useState<boolean>(false);
   const [isMine, setIsMine] = useState<boolean>(false);
   const [url, setUrl] = useState<string>('');
+  const [option, setOption] = useState<{
+    linkType: number;
+    linkAnalytics: number;
+  }>({ linkType: 0, linkAnalytics: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isLoggedIn = !!localStorage.getItem('token');
 
   const handleUrlChange = (event: any) => {
     if (isShortened) return;
@@ -134,6 +159,10 @@ export const Hero: React.FC = () => {
     setIsMine(event.target.checked);
   };
 
+  const handleOptionChange = (name: string) => (event: any) => {
+    setOption({ ...option, [name]: event.target.value });
+  };
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
@@ -141,14 +170,15 @@ export const Hero: React.FC = () => {
 
     const result = await Util.fetch({
       query: `
-        mutation Shorten($url: String!) {
-          shortenUrl(url: $url) {
+        mutation Shorten($url: String!, $isObscured: Boolean!) {
+          shortenUrl(url: $url, isObscured: $isObscured) {
             hash
           }
         }
       `,
       variables: {
         url,
+        isObscured: option.linkType == 1,
       },
     });
 
@@ -181,7 +211,10 @@ export const Hero: React.FC = () => {
       </div>
       <div className="side">
         <form onSubmit={handleSubmit}>
-          <h3>Just paste any link here and see the magic happen</h3>
+          <h3>
+            <ArrowBottomLeftThickIcon />
+            Just paste any link here and see the magic happen
+          </h3>
 
           <Styled.Input done={isShortened}>
             <input
@@ -204,27 +237,38 @@ export const Hero: React.FC = () => {
             )}
           </Styled.Input>
 
-          <p>
+          <Styled.Text>
             I want my link to be{' '}
-            <Dropdown id="linkType" selected={0} options={linkTypeOptions} />,
+            <Dropdown
+              id="linkType"
+              selected={option.linkType}
+              options={linkTypeOptions}
+              onChange={handleOptionChange('linkType')}
+            />
+            <br />
             and{' '}
             <Dropdown
               id="linkAnalytics"
-              selected={0}
+              selected={option.linkAnalytics}
               options={linkAnalyticsOptions}
+              onChange={handleOptionChange('linkAnalytics')}
             />{' '}
             how it is used.
-          </p>
+          </Styled.Text>
 
-          <Checkbox
-            label="Link this URL to my account"
-            checked={isMine}
-            onChange={handleMineChange}
-          />
+          {isLoggedIn && (
+            <Checkbox
+              label="Link this URL to my account"
+              checked={isMine}
+              onChange={handleMineChange}
+            />
+          )}
 
+          {/*
           <input type="email" placeholder="Email" />
           <input type="password" placeholder="Password" />
           <input type="date" placeholder="Time" />
+          */}
         </form>
       </div>
     </Styled.Hero>

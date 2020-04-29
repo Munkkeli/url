@@ -24,15 +24,30 @@ const login = (req, res, next) => {
   })(req, res, next);
 };
 
-const register = async ({ email, password }) => {
-  const isInUse = await User.count({ email });
-  if (isInUse > 0) throw new Error('Email is already in use, please login.');
+const register = (req, { email, password }) =>
+  new Promise(async (resolve, reject) => {
+    const isInUse = await User.find({ email });
+    if (isInUse.length) {
+      return reject(new Error('Email is already in use, please login.'));
+    }
 
-  await User.create({
-    email,
-    password: p4ssw0rd.hash(password),
+    const createResult = await User.create({
+      email,
+      password: p4ssw0rd.hash(password),
+    });
+
+    const user = {
+      _id: createResult._id.toString(),
+      email: createResult.email,
+    };
+
+    req.login(user, { session: false }, (error) => {
+      if (error) return reject(error);
+
+      const token = jwt.sign(user, 'your_jwt_secret');
+      return resolve({ token });
+    });
   });
-};
 
 module.exports = {
   login,

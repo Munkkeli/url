@@ -59,7 +59,7 @@ export const Register: React.FC = () => {
       query: `
         mutation Register($email: String!, $password: String!) {
           registerUser(email: $email, password: $password) {
-            email
+            token
           }
         }
       `,
@@ -69,7 +69,11 @@ export const Register: React.FC = () => {
       },
     });
 
-    if (!result) {
+    if (result && result.registerUser && result.registerUser.token) {
+      localStorage.setItem('token', result.registerUser.token);
+      window.location.href = '/';
+    } else {
+      // TODO: Show error
     }
   };
 
