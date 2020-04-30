@@ -2,10 +2,16 @@
 const URL = require('../models/urlModel');
 const matomo = require('../utils/matomo');
 
-const minify = async (req, { url, password, isObscured, expiresAt }) => {
+const minify = async (
+  req,
+  { url, password, isObscured, isMine, expiresAt }
+) => {
   matomo.trackUrlCreate(req, url);
 
+  const _user = isMine && req.user ? req.user._id : undefined;
+
   return URL.create({
+    _user,
     url,
     password,
     isObscured: isObscured === true,

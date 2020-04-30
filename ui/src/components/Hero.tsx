@@ -170,8 +170,8 @@ export const Hero: React.FC = () => {
 
     const result = await Util.fetch({
       query: `
-        mutation Shorten($url: String!, $isObscured: Boolean!) {
-          shortenUrl(url: $url, isObscured: $isObscured) {
+        mutation Shorten($url: String!, $isObscured: Boolean!, $isMine: Boolean!) {
+          shortenUrl(url: $url, isObscured: $isObscured, isMine: $isMine) {
             hash
           }
         }
@@ -179,6 +179,7 @@ export const Hero: React.FC = () => {
       variables: {
         url,
         isObscured: option.linkType == 1,
+        isMine,
       },
     });
 

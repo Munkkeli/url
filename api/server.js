@@ -20,27 +20,30 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
-app.use('/auth', auth);
-app.use('/', url);
+const authenticate = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (error, user, info) => {
+    if (error) throw new Error('Authentication error');
+    if (!user) return next();
 
-const checkAuth = (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) throw new Error('Authentication error');
-    if (!user) throw new Error('Not authenticated');
-
-    req.logIn(user, function (err) {
-      if (err) throw new Error('Authentication error');
+    req.logIn(user, { session: false }, (error) => {
+      if (error) throw new Error('Authentication error');
       return next();
     });
   })(req, res, next);
 };
 
+app.use(authenticate);
+
+app.use('/auth', auth);
+app.use('/', url);
+
 app.use('/graphql', (req, res, next) => {
   graphqlHTTP({
     schema: MyGraphQLSchema,
     graphiql: true,
-    context: { req, res, next, checkAuth },
+    context: { req, res, next },
   })(req, res, next);
 });
 

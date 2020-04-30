@@ -57,6 +57,7 @@ const Mutation = new GraphQLObjectType({
         url: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: GraphQLString },
         isObscured: { type: GraphQLBoolean },
+        isMine: { type: GraphQLBoolean },
         expiresAt: { type: GraphQLInt },
       },
       resolve(parent, args, { req, res, next, checkAuth }) {

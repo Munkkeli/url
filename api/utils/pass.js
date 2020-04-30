@@ -5,13 +5,14 @@ const p4ssw0rd = require('p4ssw0rd');
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 const Strategy = require('passport-local').Strategy;
-const userModel = require('../models/userModel');
+const User = require('../models/userModel');
 
 // local strategy for username password login
 passport.use(
   new Strategy(async (email, password, done) => {
     try {
-      const user = userModel.getUserLogin(email);
+      console.log('login', email);
+      const user = User.findOne({ email });
       console.log('Local strategy', user); // result is binary row
       if (user === undefined) {
         p4ssw0rd.simulate();
@@ -31,14 +32,15 @@ passport.use(
 );
 
 passport.use(
+  'jwt',
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
       secretOrKey: 'your_jwt_secret',
     },
-    (jwtPayload, done) => {
-      const user = userModel.getUserLogin(jwtPayload.email);
-      return done(null, user);
+    async (jwtPayload, done) => {
+      const user = await User.findOne({ email: jwtPayload.email });
+      return done(null, { _id: user._id, email: user.email });
     }
   )
 );
