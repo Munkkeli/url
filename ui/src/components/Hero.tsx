@@ -134,16 +134,16 @@ const linkAnalyticsOptions = [
 const shortenedBaseUrl = 'http://localhost:3001/';
 
 export const Hero: React.FC = () => {
+  const isLoggedIn = !!localStorage.getItem('token');
+
   const [isShortened, setIsShortened] = useState<boolean>(false);
-  const [isMine, setIsMine] = useState<boolean>(false);
+  const [isMine, setIsMine] = useState<boolean>(isLoggedIn);
   const [url, setUrl] = useState<string>('');
   const [option, setOption] = useState<{
     linkType: number;
     linkAnalytics: number;
   }>({ linkType: 0, linkAnalytics: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const isLoggedIn = !!localStorage.getItem('token');
 
   const handleUrlChange = (event: any) => {
     if (isShortened) return;

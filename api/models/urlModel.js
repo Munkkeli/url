@@ -23,6 +23,7 @@ const urlSchema = new Schema({
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
   hash: { type: String, index: true, unique: true },
   url: { type: String, required: true },
+  title: String,
   password: String,
   isObscured: Boolean,
   expiresAt: Date,

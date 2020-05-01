@@ -1,6 +1,7 @@
 'use strict';
 const URL = require('../models/urlModel');
 const matomo = require('../utils/matomo');
+const parse = require('../utils/parse');
 
 const minify = async (
   req,
@@ -10,13 +11,22 @@ const minify = async (
 
   const _user = isMine && req.user ? req.user._id : undefined;
 
-  return URL.create({
+  const record = await URL.create({
     _user,
     url,
     password,
     isObscured: isObscured === true,
     expiresAt,
   });
+
+  if (!record) throw new Error('Unable to create a record');
+
+  // Set the title asynchronous
+  parse
+    .title(url)
+    .then((title) => URL.updateOne({ _id: record._id }, { title }));
+
+  return record;
 };
 
 const redirect = async (req, res, next) => {
@@ -30,7 +40,14 @@ const redirect = async (req, res, next) => {
   return res.redirect(record.url);
 };
 
+const list = async (req) => {
+  if (!req.user) throw new Error('Not authorized');
+
+  return URL.find({ _user: req.user._id });
+};
+
 module.exports = {
   minify,
   redirect,
+  list,
 };

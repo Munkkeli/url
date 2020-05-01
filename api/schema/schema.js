@@ -21,12 +21,12 @@ const urlType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     hash: { type: GraphQLString },
     url: { type: GraphQLString },
-    // TODO: user
+    title: { type: GraphQLString },
     password: { type: GraphQLString },
     isObscured: { type: GraphQLBoolean },
-    expiresAt: { type: GraphQLInt },
-    updatedAt: { type: GraphQLInt },
-    createdAt: { type: GraphQLInt },
+    expiresAt: { type: GraphQLString },
+    updatedAt: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
   }),
 });
 
@@ -84,6 +84,13 @@ const Mutation = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
+    listOwnURLs: {
+      type: new GraphQLList(urlType),
+      description: 'Get all URLs by user',
+      resolve(parent, args, { req }) {
+        return urlController.list(req);
+      },
+    },
     statistics: {
       type: GraphQLInt,
       description: 'Dummy endpoint for now',
