@@ -1,28 +1,32 @@
 'use strict';
 const jwt = require('jsonwebtoken');
-const passport = require('passport');
 const p4ssw0rd = require('p4ssw0rd');
 const User = require('../models/userModel');
 
-const login = (req, res, next) => {
-  passport.authenticate('local', { session: false }, (err, user, info) => {
-    console.log(err, user, info);
-    if (err || !user) {
-      return res.status(400).json({
-        message: 'Something is not right',
-        user: user,
-      });
+const login = (req, { email, password }) =>
+  new Promise(async (resolve, reject) => {
+    const record = await User.findOne({ email });
+    if (!record) {
+      p4ssw0rd.simulate();
+      return resolve({});
     }
-    req.login(user, { session: false }, (err) => {
-      if (err) {
-        res.send(err);
-      }
+
+    if (!p4ssw0rd.check(password, record.password)) {
+      return resolve({});
+    }
+
+    const user = {
+      _id: record._id.toString(),
+      email: record.email,
+    };
+
+    req.login(user, { session: false }, (error) => {
+      if (error) return reject(error);
 
       const token = jwt.sign(user, 'your_jwt_secret');
-      return res.json({ user, token });
+      return resolve({ token });
     });
-  })(req, res, next);
-};
+  });
 
 const register = (req, { email, password }) =>
   new Promise(async (resolve, reject) => {

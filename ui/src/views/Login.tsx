@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { Color } from '../Style';
+import * as Util from '../Util';
 
 const Styled = {
   Page: styled.div`
@@ -51,14 +52,33 @@ const Styled = {
 export const Login: React.FC = () => {
   const { register, handleSubmit, errors } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    const result = await Util.fetch({
+      query: `
+        mutation Login($email: String!, $password: String!) {
+          loginUser(email: $email, password: $password) {
+            token
+          }
+        }
+      `,
+      variables: {
+        email: data.email,
+        password: data.password,
+      },
+    });
+
+    if (result && result.loginUser && result.loginUser.token) {
+      localStorage.setItem('token', result.loginUser.token);
+      window.location.href = '/';
+    } else {
+      // TODO: Show error
+    }
   };
 
   return (
     <Styled.Page>
       <Styled.Form onSubmit={handleSubmit(onSubmit)}>
-        <h2>Login</h2>
+        <h2>Sign In</h2>
 
         <Styled.Input>
           <label>Email</label>

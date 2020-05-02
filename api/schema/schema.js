@@ -78,6 +78,17 @@ const Mutation = new GraphQLObjectType({
         return authController.register(req, { ...args });
       },
     },
+    loginUser: {
+      type: registerType,
+      description: 'Login a user',
+      args: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args, { req, res, next, checkAuth }) {
+        return authController.login(req, { ...args });
+      },
+    },
   },
 });
 

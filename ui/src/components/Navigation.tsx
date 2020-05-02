@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import AccountIcon from 'mdi-react/AccountIcon';
 import MenuIcon from 'mdi-react/MenuIcon';
+import ExitToAppIcon from 'mdi-react/ExitToAppIcon';
 import { Color } from '../Style';
 
 const Styled = {
@@ -19,6 +20,14 @@ const Styled = {
 
     h1 {
       color: #e9d8ff;
+    }
+
+    > div > div {
+      display: flex;
+
+      > a {
+        margin-left: 16px;
+      }
     }
 
     a {
@@ -45,13 +54,23 @@ export const Navigation: React.FC = () => {
       <div>
         {!isLoggedIn && (
           <a href="/login">
-            Login <AccountIcon />
+            Sign In <AccountIcon />
           </a>
         )}
         {isLoggedIn && (
-          <a href="/manage">
-            My Links <MenuIcon />
-          </a>
+          <div>
+            <a
+              href="/"
+              onClick={() => {
+                localStorage.removeItem('token');
+              }}
+            >
+              Sign Out <ExitToAppIcon />
+            </a>
+            <a href="/manage">
+              My Links <MenuIcon />
+            </a>
+          </div>
         )}
       </div>
     </Styled.Navigation>
