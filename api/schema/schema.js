@@ -30,6 +30,14 @@ const urlType = new GraphQLObjectType({
   }),
 });
 
+const urlRemoveType = new GraphQLObjectType({
+  name: 'urlRemove',
+  description: 'URL remove response',
+  fields: () => ({
+    success: { type: GraphQLBoolean },
+  }),
+});
+
 const userType = new GraphQLObjectType({
   name: 'user',
   description: 'User record',
@@ -60,11 +68,18 @@ const Mutation = new GraphQLObjectType({
         isMine: { type: GraphQLBoolean },
         expiresAt: { type: GraphQLInt },
       },
-      resolve(parent, args, { req, res, next, checkAuth }) {
-        // TODO: Make auth work
-        // checkAuth(req, res, next);
-
+      resolve(parent, args, { req, res, next }) {
         return urlController.minify(req, { ...args });
+      },
+    },
+    removeUrl: {
+      type: urlRemoveType,
+      description: 'Remove a URL',
+      args: {
+        hash: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args, { req, res, next }) {
+        return urlController.remove(req, { ...args });
       },
     },
     registerUser: {
@@ -74,7 +89,7 @@ const Mutation = new GraphQLObjectType({
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args, { req, res, next, checkAuth }) {
+      resolve(parent, args, { req, res, next }) {
         return authController.register(req, { ...args });
       },
     },
@@ -85,7 +100,7 @@ const Mutation = new GraphQLObjectType({
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args, { req, res, next, checkAuth }) {
+      resolve(parent, args, { req, res, next }) {
         return authController.login(req, { ...args });
       },
     },

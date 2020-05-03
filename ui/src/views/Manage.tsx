@@ -49,6 +49,25 @@ const Styled = {
   `,
   Content: styled.div`
     flex: 1;
+    padding-left: 32px;
+
+    h1 {
+      color: #e9d8ff;
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      color: ${Color.text};
+
+      svg {
+        padding-right: 8px;
+      }
+    }
+
+    button {
+      padding: 8px;
+    }
   `,
 };
 
@@ -56,31 +75,55 @@ export const Manage: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [selected, setSelected] = useState<any | null>(null);
 
+  const getList = async () => {
+    const result = await Util.fetch({
+      query: `
+        {
+          listOwnURLs {
+            hash,
+            url,
+            title,
+            createdAt
+          }
+        }
+      `,
+    });
+
+    if (result && result.listOwnURLs) {
+      setList(result.listOwnURLs);
+      setSelected(null);
+    }
+  };
+
   useEffect(() => {
     (async () => {
-      const result = await Util.fetch({
-        query: `
-          {
-            listOwnURLs {
-              hash,
-              url,
-              title,
-              createdAt
-            }
-          }
-        `,
-      });
-
-      if (result && result.listOwnURLs) {
-        setList(result.listOwnURLs);
-      }
+      await getList();
     })();
   }, []);
 
-  const selectedURL = list.length ? list[0] : null;
-
   const handleCardClick = (hash: string) => () => {
     setSelected(list.find((x) => x.hash === hash));
+  };
+
+  const handleDeleteClick = (hash: string) => async () => {
+    if (window.confirm('This cannot be reversed. Are you sure?')) {
+      const result = await Util.fetch({
+        query: `
+          mutation Remove($hash: String!) {
+            removeUrl(hash: $hash) {
+              success
+            }
+          }
+        `,
+        variables: {
+          hash,
+        },
+      });
+
+      if (result.removeUrl.success) {
+        await getList();
+      }
+    }
   };
 
   return (
@@ -106,6 +149,7 @@ export const Manage: React.FC = () => {
                 <LinkIcon /> {selected.url}
               </a>
             </p>
+            <button onClick={handleDeleteClick(selected.hash)}>Delete</button>
           </>
         )}
       </Styled.Content>

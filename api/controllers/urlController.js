@@ -46,8 +46,20 @@ const list = async (req) => {
   return URL.find({ _user: req.user._id });
 };
 
+const remove = async (req, { hash }) => {
+  if (!req.user) throw new Error('Not authorized');
+
+  const record = await URL.findOne({ hash, _user: req.user._id });
+  if (!record) throw new Error('Not authorized');
+
+  await URL.deleteOne({ hash });
+
+  return { success: true };
+};
+
 module.exports = {
   minify,
   redirect,
   list,
+  remove,
 };
