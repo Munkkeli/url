@@ -71,6 +71,8 @@ const Styled = {
   `,
 };
 
+const shortenedBaseUrl = 'http://localhost:3001/';
+
 export const Manage: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [selected, setSelected] = useState<any | null>(null);
@@ -147,6 +149,11 @@ export const Manage: React.FC = () => {
             <p>
               <a href={selected.url}>
                 <LinkIcon /> {selected.url}
+              </a>
+            </p>
+            <p>
+              <a href={`${shortenedBaseUrl}${selected.hash}`}>
+                <LinkIcon /> {`${shortenedBaseUrl}${selected.hash}`}
               </a>
             </p>
             <button onClick={handleDeleteClick(selected.hash)}>Delete</button>

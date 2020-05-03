@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Color } from '../Style';
 import * as Util from '../Util';
 import ArrowRightCircleOutlineIcon from 'mdi-react/ArrowRightCircleOutlineIcon';
 import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
 import ArrowBottomLeftThickIcon from 'mdi-react/ArrowBottomLeftThickIcon';
+import io from 'socket.io-client';
 
 import { Checkbox } from './Checkbox';
 import { Dropdown } from './Dropdown';
@@ -145,6 +146,41 @@ export const Hero: React.FC = () => {
   }>({ linkType: 0, linkAnalytics: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [numShortened, setNumShortened] = useState<string>('...');
+  const [numClicked, setNumClicked] = useState<string>('...');
+
+  useEffect(() => {
+    const socket = io('http://localhost:3001');
+
+    socket.on('minifiedIndex', (data: number) => {
+      setNumShortened('' + data);
+    });
+
+    socket.on('visitedIndex', (data: number) => {
+      setNumClicked('' + data);
+    });
+
+    Util.fetch({
+      query: `
+        {
+          stats {
+            minifiedIndex,
+            visitedIndex
+          }
+        }
+      `,
+    }).then((data) => {
+      if (data && data.stats) {
+        setNumShortened('' + data.stats.minifiedIndex);
+        setNumClicked('' + data.stats.visitedIndex);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const handleUrlChange = (event: any) => {
     if (isShortened) return;
     setUrl(event.target.value);
@@ -206,8 +242,12 @@ export const Hero: React.FC = () => {
         </p>
 
         <ul>
-          <li>asd</li>
-          <li>das</li>
+          <li>
+            <b>{numShortened}</b> links shortened
+          </li>
+          <li>
+            <b>{numClicked}</b> links clicked
+          </li>
         </ul>
       </div>
       <div className="side">

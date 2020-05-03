@@ -1,5 +1,5 @@
 'use strict';
-const URL = require('../models/urlModel');
+const Index = require('../models/indexModel');
 const authController = require('../controllers/authController');
 const urlController = require('../controllers/urlController');
 
@@ -46,6 +46,15 @@ const userType = new GraphQLObjectType({
   }),
 });
 
+const statsType = new GraphQLObjectType({
+  name: 'stats',
+  description: 'Stats visible on the front page',
+  fields: () => ({
+    minifiedIndex: { type: GraphQLInt },
+    visitedIndex: { type: GraphQLInt },
+  }),
+});
+
 const registerType = new GraphQLObjectType({
   name: 'register',
   description: 'Register response',
@@ -68,8 +77,8 @@ const Mutation = new GraphQLObjectType({
         isMine: { type: GraphQLBoolean },
         expiresAt: { type: GraphQLInt },
       },
-      resolve(parent, args, { req, res, next }) {
-        return urlController.minify(req, { ...args });
+      resolve(parent, args, { req, res, next, io }) {
+        return urlController.minify(req, { ...args }, io);
       },
     },
     removeUrl: {
@@ -117,11 +126,24 @@ const RootQuery = new GraphQLObjectType({
         return urlController.list(req);
       },
     },
-    statistics: {
-      type: GraphQLInt,
-      description: 'Dummy endpoint for now',
+    stats: {
+      type: statsType,
+      description: 'List front page statistics',
       resolve(parent, args) {
-        return 1;
+        return new Promise(async (resolve) => {
+          const indexList = await Index.find({
+            _id: { $in: ['minifiedIndex', 'visitedIndex'] },
+          });
+          const minifiedIndex = indexList.find(
+            (x) => x._id === 'minifiedIndex'
+          );
+          const visitedIndex = indexList.find((x) => x._id === 'visitedIndex');
+
+          return resolve({
+            minifiedIndex: minifiedIndex ? minifiedIndex.seq : 0,
+            visitedIndex: visitedIndex ? visitedIndex.seq : 0,
+          });
+        });
       },
     },
   },

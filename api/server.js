@@ -16,6 +16,9 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
@@ -37,18 +40,20 @@ const authenticate = (req, res, next) => {
 app.use(authenticate);
 
 app.use('/auth', auth);
-app.use('/', url);
+app.use('/', url(io));
 
 app.use('/graphql', (req, res, next) => {
   graphqlHTTP({
     schema: MyGraphQLSchema,
     graphiql: true,
-    context: { req, res, next },
+    context: { req, res, next, io },
   })(req, res, next);
 });
 
 db.on('connected', () => {
-  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+  http.listen(port, () =>
+    console.log(`Example app listening on port ${port}!`)
+  );
 
   /*
   setTimeout(() => {
