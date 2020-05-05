@@ -33,7 +33,7 @@ app.use(passport.initialize());
 /**
  * Serve the built UI files
  */
-app.use(express.static('../ui/build'));
+app.use(express.static('./build'));
 
 /**
  * Authentication middleware to provide the req.user if the user has logged in
@@ -72,7 +72,7 @@ app.use('/graphql', (req, res, next) => {
  * Handle frontend navigation
  */
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../ui/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, './build', 'index.html'));
 });
 
 db.on('connected', () => {
