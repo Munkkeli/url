@@ -1,6 +1,10 @@
+'use strict';
 const request = require('request');
 const cheerio = require('cheerio');
 
+/**
+ * Get page title from an URL
+ */
 const title = (url) =>
   new Promise((resolve) => {
     request(url, (error, response, body) => {

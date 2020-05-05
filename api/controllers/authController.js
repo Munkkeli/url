@@ -23,7 +23,7 @@ const login = (req, { email, password }) =>
     req.login(user, { session: false }, (error) => {
       if (error) return reject(error);
 
-      const token = jwt.sign(user, 'your_jwt_secret');
+      const token = jwt.sign(user, process.env.JWT_SECRET);
       return resolve({ token });
     });
   });

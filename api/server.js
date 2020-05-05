@@ -7,16 +7,21 @@ const helmet = require('helmet');
 const cors = require('cors');
 const graphqlHTTP = require('express-graphql');
 const MyGraphQLSchema = require('./schema/schema');
-require('./utils/pass');
+const path = require('path');
+
+require('./utils/jwt');
 require('./utils/matomo');
+
 const db = require('./utils/db');
-const auth = require('./routes/authRouter');
 const url = require('./routes/urlRouter');
 const port = process.env.PORT || 3000;
 
 const app = express();
-
 const http = require('http').createServer(app);
+
+/**
+ * Socket.io to allow real time statistics update on the frontpage
+ */
 const io = require('socket.io')(http);
 
 app.use(cors());
@@ -25,6 +30,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
+/**
+ * Serve the built UI files
+ */
+app.use(express.static('../ui/build'));
+
+/**
+ * Authentication middleware to provide the req.user if the user has logged in
+ */
 const authenticate = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (error, user, info) => {
     if (error) throw new Error('Authentication error');
@@ -39,9 +52,14 @@ const authenticate = (req, res, next) => {
 
 app.use(authenticate);
 
-app.use('/auth', auth);
+/**
+ * All the application routes
+ */
 app.use('/', url(io));
 
+/**
+ * GraphQL route, logic in schema/schema.js
+ */
 app.use('/graphql', (req, res, next) => {
   graphqlHTTP({
     schema: MyGraphQLSchema,
@@ -50,19 +68,15 @@ app.use('/graphql', (req, res, next) => {
   })(req, res, next);
 });
 
+/**
+ * Handle frontend navigation
+ */
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../ui/build', 'index.html'));
+});
+
 db.on('connected', () => {
   http.listen(port, () =>
     console.log(`Example app listening on port ${port}!`)
   );
-
-  /*
-  setTimeout(() => {
-    const URL = require('./models/urlModel');
-
-    URL.create({
-      url: 'https://www.youtube.com/watch?v=TwXQfT_0DdU',
-      isObscured: true,
-    });
-  }, 1000);
-  */
 });

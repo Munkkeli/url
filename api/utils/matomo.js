@@ -1,5 +1,22 @@
+/**
+ * Module to send statistics about URL creation and clicks to a Matomo instance
+ */
+
+'use strict';
 const url = require('url');
 const MatomoTracker = require('matomo-tracker');
+
+/**
+ * If no Matomo ID is provided, do not send statistics
+ */
+if (!process.env.MATOMO_SITE_ID) {
+  module.exports = {
+    trackUrlCreate: () => {},
+    trackUrlVisit: () => {},
+  };
+
+  return;
+}
 
 const matomo = new MatomoTracker(
   process.env.MATOMO_SITE_ID,

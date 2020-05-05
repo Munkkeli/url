@@ -1,18 +1,19 @@
 'use strict';
 const passport = require('passport');
 const passportJWT = require('passport-jwt');
-const p4ssw0rd = require('p4ssw0rd');
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
-const Strategy = require('passport-local').Strategy;
 const User = require('../models/userModel');
 
+/**
+ * Passport strategy to handle JWT bearer tokens
+ */
 passport.use(
   'jwt',
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'your_jwt_secret',
+      secretOrKey: process.env.JWT_SECRET,
     },
     async (jwtPayload, done) => {
       const user = await User.findOne({ email: jwtPayload.email });

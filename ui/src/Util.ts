@@ -1,4 +1,4 @@
-const apiURL = 'http://localhost:3001/graphql';
+const apiURL = '/graphql';
 
 export const fetch = async (query: any) => {
   const options = {
