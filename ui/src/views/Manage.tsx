@@ -76,6 +76,8 @@ const shortenedBaseUrl = 'http://localhost:3001/';
 export const Manage: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const [selected, setSelected] = useState<any | null>(null);
+  const [isUpdatingUrl, setIsUpdatingUrl] = useState<boolean>(false);
+  const [updatedUrl, setUpdatedUrl] = useState<string>('');
 
   const getList = async () => {
     const result = await Util.fetch({
@@ -128,6 +130,32 @@ export const Manage: React.FC = () => {
     }
   };
 
+  const handleUpdateClick = (hash: string) => async () => {
+    setIsUpdatingUrl(!isUpdatingUrl);
+
+    if (isUpdatingUrl && updatedUrl) {
+      const result = await Util.fetch({
+        query: `
+          mutation Update($hash: String!, $url: String!) {
+            updateUrl(hash: $hash, url: $url) {
+              success
+            }
+          }
+        `,
+        variables: {
+          hash,
+          url: updatedUrl,
+        },
+      });
+
+      if (result.updateUrl.success) {
+        await getList();
+      }
+    }
+
+    setUpdatedUrl('');
+  };
+
   return (
     <Styled.Page>
       <Styled.List>
@@ -156,6 +184,14 @@ export const Manage: React.FC = () => {
                 <LinkIcon /> {`${shortenedBaseUrl}${selected.hash}`}
               </a>
             </p>
+            {isUpdatingUrl && (
+              <input
+                type="text"
+                value={updatedUrl}
+                onChange={(event: any) => setUpdatedUrl(event.target.value)}
+              />
+            )}
+            <button onClick={handleUpdateClick(selected.hash)}>Update</button>
             <button onClick={handleDeleteClick(selected.hash)}>Delete</button>
           </>
         )}

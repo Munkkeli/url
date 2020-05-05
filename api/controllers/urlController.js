@@ -70,6 +70,15 @@ const list = async (req) => {
   return URL.find({ _user: req.user._id });
 };
 
+const update = async (req, { hash, url }) => {
+  if (!req.user) throw new Error('Not authorized');
+
+  const record = await URL.updateOne({ hash, _user: req.user._id }, { url });
+  if (!record) throw new Error('Not authorized');
+
+  return { success: true };
+};
+
 const remove = async (req, { hash }) => {
   if (!req.user) throw new Error('Not authorized');
 
@@ -86,4 +95,5 @@ module.exports = {
   redirect,
   list,
   remove,
+  update,
 };

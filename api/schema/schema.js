@@ -81,6 +81,17 @@ const Mutation = new GraphQLObjectType({
         return urlController.minify(req, { ...args }, io);
       },
     },
+    updateUrl: {
+      type: urlRemoveType,
+      description: 'Update URL',
+      args: {
+        hash: { type: new GraphQLNonNull(GraphQLString) },
+        url: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args, { req, res, next }) {
+        return urlController.update(req, { ...args });
+      },
+    },
     removeUrl: {
       type: urlRemoveType,
       description: 'Remove a URL',
