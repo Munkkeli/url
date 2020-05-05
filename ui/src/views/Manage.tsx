@@ -71,7 +71,7 @@ const Styled = {
   `,
 };
 
-const shortenedBaseUrl = 'http://localhost:3001/';
+const shortenedBaseUrl = Util.apiURL + '/';
 
 export const Manage: React.FC = () => {
   const [list, setList] = useState<any[]>([]);

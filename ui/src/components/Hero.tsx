@@ -132,7 +132,7 @@ const linkAnalyticsOptions = [
   },
 ];
 
-const shortenedBaseUrl = 'http://localhost:3001/';
+const shortenedBaseUrl = Util.apiURL + '/';
 
 export const Hero: React.FC = () => {
   const isLoggedIn = !!localStorage.getItem('token');
@@ -150,7 +150,7 @@ export const Hero: React.FC = () => {
   const [numClicked, setNumClicked] = useState<string>('...');
 
   useEffect(() => {
-    const socket = io('http://localhost:3001');
+    const socket = io(Util.apiURL);
 
     socket.on('minifiedIndex', (data: number) => {
       setNumShortened('' + data);

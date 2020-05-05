@@ -1,4 +1,6 @@
-const apiURL = '/graphql';
+const apiURL = 'http://localhost:3001';
+
+export { apiURL };
 
 export const fetch = async (query: any) => {
   const options = {
@@ -12,7 +14,7 @@ export const fetch = async (query: any) => {
   };
 
   try {
-    const response = await window.fetch(apiURL, options);
+    const response = await window.fetch(apiURL + '/graphql', options);
     const json = await response.json();
     return json.data;
   } catch (e) {
