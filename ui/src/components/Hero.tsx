@@ -14,8 +14,7 @@ const Styled = {
   Hero: styled.div<{ done: boolean }>`
     display: flex;
     padding: 200px;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
     background-color: ${Color.primary};
     box-sizing: border-box;
     color: ${Color.text};
