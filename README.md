@@ -1,5 +1,7 @@
 # URL Shortener Application
 
+Done as a school assignment for the Metropolia University of Applied Sciences.
+
 #### by Tuomas Pöyry
 
 ## Setup
